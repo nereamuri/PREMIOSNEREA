@@ -1,0 +1,42 @@
+@import "tailwindcss";
+
+/*
+ * Tailwind v4 configura el tema directamente en CSS con @theme, en vez de
+ * un tailwind.config.ts (que ya no es necesario para esto). Cada variable
+ * queda disponible como utilidad (bg-ink-950, text-accent, font-sans...)
+ * y también como custom property CSS normal (var(--color-accent)).
+ *
+ * Paleta provisional "corporate premium" — se sustituirá por los colores
+ * reales extraídos del logo en la Fase 2, sin tocar el resto del código.
+ */
+@theme {
+  --color-ink-950: #0b0e14;
+  --color-ink-900: #12161f;
+  --color-ink-800: #1b212e;
+
+  --color-neutral-50: #fafaf9;
+  --color-neutral-100: #f2f1ee;
+  --color-neutral-400: #8a8a85;
+
+  --color-accent: #c9a24b; /* dorado/champán, acento de "ganador" */
+  --color-accent-soft: #e4d4a8;
+
+  --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --animate-fade-up: fade-up 0.4s ease-out;
+
+  @keyframes fade-up {
+    0% {
+      opacity: 0;
+      transform: translateY(8px);
+    }
+    100% {
+      opacity: 1;
+      transform: translateY(0);
+    }
+  }
+}
+
+body {
+  @apply bg-neutral-50 text-ink-950 antialiased;
+}

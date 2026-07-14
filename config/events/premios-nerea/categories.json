@@ -1,0 +1,10 @@
+[
+  { "order": 1, "name": "Mejor compañero/a", "description": "" },
+  { "order": 2, "name": "Innovación del año", "description": "" },
+  { "order": 3, "name": "Liderazgo", "description": "" },
+  { "order": 4, "name": "Trayectoria", "description": "" },
+  { "order": 5, "name": "Espíritu de equipo", "description": "" },
+  { "order": 6, "name": "Mejor incorporación", "description": "" },
+  { "order": 7, "name": "Excelencia en el servicio al cliente", "description": "" },
+  { "order": 8, "name": "Premio a la cultura de empresa", "description": "" }
+]

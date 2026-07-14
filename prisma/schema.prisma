@@ -1,0 +1,127 @@
+// Schema de datos — Premios Nerea
+// Base de datos: PostgreSQL gestionado por Supabase.
+//
+// IMPORTANTE (seguridad): esta conexión (DATABASE_URL / DIRECT_URL) usa el
+// rol de Postgres directo de Supabase, NO pasa por PostgREST ni por las
+// políticas de Row Level Security del dashboard. Es decir: RLS no protege
+// nada de lo que se accede vía Prisma. Toda la protección de "quién puede
+// escribir qué" vive en el código de src/server/services, no en la base de
+// datos. Ver también /supabase/policies/ para las políticas que SÍ aplican
+// (las de Storage, que se acceden vía el cliente público de Supabase).
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL") // conexión directa de Supabase, necesaria para migraciones
+}
+
+enum VotingStatus {
+  pending
+  in_progress
+  submitted
+}
+
+model Event {
+  id             String    @id @default(uuid())
+  slug           String    @unique
+  name           String
+  description    String?
+  colorPrimary   String? // se define en Fase 2 con el logo real
+  colorAccent    String?
+  logoUrl        String?
+  votingOpensAt  DateTime?
+  votingClosesAt DateTime?
+  createdAt      DateTime  @default(now())
+  updatedAt      DateTime  @updatedAt
+
+  categories   Category[]
+  participants Participant[]
+
+  @@map("events")
+}
+
+model Category {
+  id          String   @id @default(uuid())
+  eventId     String
+  event       Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name        String
+  description String?
+  order       Int      @default(0)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  candidates Candidate[]
+  selections VoteSelection[]
+
+  @@index([eventId])
+  @@map("categories")
+}
+
+model Candidate {
+  id         String   @id @default(uuid())
+  categoryId String
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  name       String
+  department String?
+  photoUrl   String? // Supabase Storage
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  selections VoteSelection[]
+
+  @@index([categoryId])
+  @@map("candidates")
+}
+
+model Participant {
+  id         String   @id @default(uuid())
+  eventId    String
+  event      Event    @relation(fields: [eventId], references: [id], onDelete: Cascade)
+  name       String
+  email      String
+  department String?
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+
+  votingSession VotingSession?
+
+  @@unique([eventId, email])
+  @@index([eventId])
+  @@map("participants")
+}
+
+model VotingSession {
+  id            String       @id @default(uuid())
+  participantId String       @unique
+  participant   Participant  @relation(fields: [participantId], references: [id], onDelete: Cascade)
+  token         String       @unique // enlace único, no correlativo (uuid v4) — ver src/lib/token.ts
+  status        VotingStatus @default(pending)
+  submittedAt   DateTime?
+  createdAt     DateTime     @default(now())
+  updatedAt     DateTime     @updatedAt
+
+  selections VoteSelection[]
+
+  @@index([token])
+  @@map("voting_sessions")
+}
+
+model VoteSelection {
+  id              String        @id @default(uuid())
+  votingSessionId String
+  votingSession   VotingSession @relation(fields: [votingSessionId], references: [id], onDelete: Cascade)
+  categoryId      String
+  category        Category      @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  candidateId     String
+  candidate       Candidate     @relation(fields: [candidateId], references: [id], onDelete: Cascade)
+  updatedAt       DateTime      @updatedAt
+
+  // Un participante solo puede tener una selección por categoría dentro de su sesión.
+  @@unique([votingSessionId, categoryId])
+  @@index([votingSessionId])
+  @@map("vote_selections")
+}

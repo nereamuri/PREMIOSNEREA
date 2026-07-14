@@ -1,0 +1,14 @@
+{
+  "slug": "premios-nerea",
+  "name": "Premios Nerea",
+  "description": "Premios internos de la empresa — edición 2026",
+  "colorPrimary": "#0B0E14",
+  "colorAccent": "#C9A24B",
+  "logoUrl": "",
+  "votingOpensAt": "2026-09-01T00:00:00.000Z",
+  "votingClosesAt": "2026-09-15T23:59:59.000Z",
+  "rules": {
+    "allowChangeBeforeSubmit": true,
+    "hideResultsUntilClose": true
+  }
+}
