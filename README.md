@@ -85,6 +85,24 @@ El evento activo se selecciona con `NEXT_PUBLIC_ACTIVE_EVENT_SLUG` en
 `.env.local`. `npm run db:seed` es lo que traduce esos JSON a filas reales
 en base de datos.
 
+## MCP de Supabase (Claude Code)
+
+El proyecto incluye `.mcp.json` con el servidor MCP oficial de Supabase ya
+apuntando a tu proyecto (`project_ref=hukbycecqoasxnkhzoqg`), en ámbito de
+proyecto (compartido vía git, visible para cualquiera que clone el repo).
+
+La primera vez que abras este proyecto con `claude` en tu terminal:
+1. Te pedirá **confirmar el workspace** (trust dialog) para poder leer
+   `.mcp.json` de un repo no verificado antes.
+2. El servidor aparecerá como **"Pending approval"** en `claude mcp list`
+   hasta que lo apruebes interactivamente.
+3. Si el servidor requiere OAuth, autentícalo con `/mcp` dentro de una
+   sesión de Claude Code.
+
+No hace falta que ejecutes `claude mcp add` tú mismo — ya está en el
+archivo. Si prefieres que sea personal (no compartido con el repo), bórralo
+de aquí y añádelo con `--scope local` en tu máquina.
+
 ## Notas de seguridad
 
 - **Prisma se conecta con el rol directo de Postgres de Supabase**, lo cual
