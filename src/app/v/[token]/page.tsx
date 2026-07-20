@@ -1,23 +1,37 @@
+import { getVotingSessionByToken } from "@/server/services/voting";
+import { VotingFlow } from "./voting-flow";
+import { ConfirmationScreen } from "./confirmation-screen";
+
 export default async function VotingEntryPage({
   params,
 }: {
   params: Promise<{ token: string }>;
 }) {
   const { token } = await params;
+  const result = await getVotingSessionByToken(token);
 
-  // Fase 3: aquí se resolverá el token contra VotingSession,
-  // se cargará el estado de progreso y se renderizará la pantalla
-  // de bienvenida o la categoría en curso.
-  return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-2 p-8 text-center">
-      <h1 className="text-2xl font-semibold">Bienvenida/o a Premios Nerea</h1>
-      <p className="text-neutral-400">
-        Token recibido: <span className="text-accent">{token}</span>
-      </p>
-      <p className="max-w-sm text-sm text-neutral-400">
-        El flujo real de votación (categorías, progreso, resumen y envío) se
-        implementa en la Fase 3.
-      </p>
-    </main>
-  );
+  if (result.kind === "invalid_format" || result.kind === "not_found") {
+    return (
+      <main className="flex min-h-screen flex-col items-center justify-center gap-4 bg-cream p-8 text-center">
+        <div className="max-w-sm rounded-3xl border-[2.5px] border-ink bg-white p-8 shadow-sticker-ink">
+          <h1 className="font-display text-2xl font-bold">
+            Enlace no válido
+          </h1>
+          <p className="mt-2 text-neutral-400">
+            Este enlace de votación no existe o ya no es válido. Comprueba que
+            lo has copiado completo, o pide uno nuevo a la organización.
+          </p>
+        </div>
+      </main>
+    );
+  }
+
+  if (result.data.status === "submitted") {
+    return <ConfirmationScreen eventName={result.data.event.name} />;
+  }
+
+  // key={token}: fuerza a React a remontar el componente si se navega de un
+  // token a otro sin recargar la página entera, para no arrastrar el paso
+  // ni las selecciones en memoria de la sesión anterior.
+  return <VotingFlow key={token} token={token} data={result.data} />;
 }

@@ -12,13 +12,16 @@
  *   npm run db:seed
  *   (o automáticamente tras `prisma migrate dev`, según prisma.config.ts)
  */
-import { PrismaClient } from "@prisma/client";
+import "dotenv/config";
+import { PrismaClient } from "../src/generated/prisma/client";
+import { PrismaPg } from "@prisma/adapter-pg";
 import {
   loadEventConfig,
   loadCategoriesConfig,
 } from "../src/lib/config/event-config";
 
-const prisma = new PrismaClient();
+const adapter = new PrismaPg({ connectionString: process.env.DATABASE_URL });
+const prisma = new PrismaClient({ adapter });
 
 async function main() {
   const slug = process.env.NEXT_PUBLIC_ACTIVE_EVENT_SLUG ?? "premios-nerea";

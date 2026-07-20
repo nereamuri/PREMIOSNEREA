@@ -3,25 +3,28 @@
 /*
  * Tailwind v4 configura el tema directamente en CSS con @theme, en vez de
  * un tailwind.config.ts (que ya no es necesario para esto). Cada variable
- * queda disponible como utilidad (bg-ink-950, text-accent, font-sans...)
- * y también como custom property CSS normal (var(--color-accent)).
+ * queda disponible como utilidad (bg-cream, text-ink, font-display...)
+ * y también como custom property CSS normal (var(--color-cream)).
  *
- * Paleta provisional "corporate premium" — se sustituirá por los colores
- * reales extraídos del logo en la Fase 2, sin tocar el resto del código.
+ * Sistema de diseño validado (Fase 3):
+ * - Fucsia SOLO como sombra/borde/relleno de bloques grandes, nunca como
+ *   color de texto ni fondo de texto pequeño (falla contraste WCAG AA).
+ * - Sombra "sticker": dura, offset, sin blur (no la difuminada por defecto
+ *   de Tailwind) — se define como utilidad shadow-sticker-ink /
+ *   shadow-sticker-fuchsia en vez de usar shadow-lg/shadow-xl.
  */
 @theme {
-  --color-ink-950: #0b0e14;
-  --color-ink-900: #12161f;
-  --color-ink-800: #1b212e;
+  --color-cream: #f7f2ea;
+  --color-ink: #111111;
+  --color-fuchsia: #e0208a;
 
-  --color-neutral-50: #fafaf9;
-  --color-neutral-100: #f2f1ee;
-  --color-neutral-400: #8a8a85;
+  --color-neutral-400: #6b6b68; /* texto secundario sobre crema/blanco, sí cumple AA */
 
-  --color-accent: #c9a24b; /* dorado/champán, acento de "ganador" */
-  --color-accent-soft: #e4d4a8;
-
+  --font-display: var(--font-instrument-sans), ui-sans-serif, system-ui, sans-serif;
   --font-sans: var(--font-inter), ui-sans-serif, system-ui, sans-serif;
+
+  --shadow-sticker-ink: 5px 5px 0 0 #111111;
+  --shadow-sticker-fuchsia: 5px 5px 0 0 #e0208a;
 
   --animate-fade-up: fade-up 0.4s ease-out;
 
@@ -38,5 +41,5 @@
 }
 
 body {
-  @apply bg-neutral-50 text-ink-950 antialiased;
+  @apply bg-cream text-ink antialiased;
 }

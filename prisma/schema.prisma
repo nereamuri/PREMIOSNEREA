@@ -10,13 +10,12 @@
 // (las de Storage, que se acceden vía el cliente público de Supabase).
 
 generator client {
-  provider = "prisma-client-js"
+  provider = "prisma-client"
+  output   = "../src/generated/prisma"
 }
 
 datasource db {
-  provider  = "postgresql"
-  url       = env("DATABASE_URL")
-  directUrl = env("DIRECT_URL") // conexión directa de Supabase, necesaria para migraciones
+  provider = "postgresql"
 }
 
 enum VotingStatus {
@@ -84,6 +83,7 @@ model Participant {
   name       String
   email      String
   department String?
+  photoUrl   String? // Supabase Storage, bucket "participant-photos"
   createdAt  DateTime @default(now())
   updatedAt  DateTime @updatedAt
 
