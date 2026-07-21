@@ -7,6 +7,7 @@ import {
   updateParticipantAction,
   type ActionResult,
 } from "@/server/actions/admin/participants";
+import { sendInvitationEmailAction } from "@/server/actions/admin/email";
 import type { ParticipantsWithSessions } from "@/server/services/admin/participants";
 
 const initialState: ActionResult = { ok: true };
@@ -24,6 +25,10 @@ export function ParticipantItem({ participant }: { participant: Participant }) {
   const [deleteError, setDeleteError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const [isDeleting, startDeleteTransition] = useTransition();
+  const [isSendingEmail, startEmailTransition] = useTransition();
+  const [emailFeedback, setEmailFeedback] = useState<
+    { ok: true } | { ok: false; error: string } | null
+  >(null);
 
   const [state, formAction] = useActionState(
     updateParticipantAction.bind(null, participant.id),
@@ -67,6 +72,14 @@ export function ParticipantItem({ participant }: { participant: Participant }) {
       // mano en vez de fingir que se copió.
       window.prompt("No se pudo copiar automáticamente. Copia el enlace:", url);
     }
+  }
+
+  function handleSendEmail() {
+    setEmailFeedback(null);
+    startEmailTransition(async () => {
+      const result = await sendInvitationEmailAction(participant.id);
+      setEmailFeedback(result);
+    });
   }
 
   if (isEditing) {
@@ -129,7 +142,7 @@ export function ParticipantItem({ participant }: { participant: Participant }) {
     <div className="flex flex-col gap-3 rounded-2xl border-2 border-ink p-4">
       <div className="flex flex-wrap items-center gap-4">
         <ParticipantPhoto photoUrl={participant.photoUrl} name={participant.name} />
-        <div className="min-w-0 flex-1">
+        <div className="min-w-[180px] flex-1">
           <p className="truncate font-display font-bold">{participant.name}</p>
           <p className="truncate text-sm text-neutral-400">{participant.email}</p>
           {participant.department && (
@@ -147,7 +160,7 @@ export function ParticipantItem({ participant }: { participant: Participant }) {
           {status ? STATUS_LABEL[status] : "Sin sesión"}
         </div>
 
-        <div className="flex shrink-0 gap-2">
+        <div className="flex shrink-0 flex-wrap gap-2">
           <button
             type="button"
             onClick={handleCopyLink}
@@ -156,6 +169,20 @@ export function ParticipantItem({ participant }: { participant: Participant }) {
           >
             {copied ? "¡Copiado!" : "Copiar enlace"}
           </button>
+          {status && status !== "submitted" && (
+            <button
+              type="button"
+              onClick={handleSendEmail}
+              disabled={isSendingEmail}
+              className="rounded-full border-2 border-ink px-4 py-1.5 text-sm font-bold disabled:opacity-40"
+            >
+              {isSendingEmail
+                ? "Enviando…"
+                : status === "in_progress"
+                  ? "Enviar recordatorio"
+                  : "Enviar invitación"}
+            </button>
+          )}
           <button
             type="button"
             onClick={() => setIsEditing(true)}
@@ -176,6 +203,11 @@ export function ParticipantItem({ participant }: { participant: Participant }) {
       {deleteError && (
         <p className="rounded-full border-2 border-ink bg-cream px-4 py-2 text-sm">
           {deleteError}
+        </p>
+      )}
+      {emailFeedback && (
+        <p className="rounded-full border-2 border-ink bg-cream px-4 py-2 text-sm">
+          {emailFeedback.ok ? "Email enviado." : emailFeedback.error}
         </p>
       )}
     </div>

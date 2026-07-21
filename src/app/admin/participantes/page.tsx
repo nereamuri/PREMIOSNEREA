@@ -2,6 +2,7 @@ import { getActiveEvent } from "@/server/services/admin/categories";
 import { getParticipantsWithSessions } from "@/server/services/admin/participants";
 import { ParticipantItem } from "./participant-item";
 import { NewParticipantForm } from "./new-participant-form";
+import { BulkEmailButton } from "./bulk-email-button";
 
 export default async function AdminParticipantesPage() {
   const event = await getActiveEvent();
@@ -15,6 +16,8 @@ export default async function AdminParticipantesPage() {
           {event.name} — {participants.length} participante(s)
         </p>
       </div>
+
+      <BulkEmailButton eventId={event.id} />
 
       <div className="flex flex-col gap-3">
         {participants.map((participant) => (

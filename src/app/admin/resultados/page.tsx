@@ -7,6 +7,7 @@ export default async function AdminResultadosPage() {
   const submitted = participants.filter(
     (p) => p.votingSession?.status === "submitted"
   ).length;
+  const isDriveConnected = Boolean(process.env.GOOGLE_REFRESH_TOKEN);
 
   return (
     <main className="mx-auto flex max-w-3xl flex-col gap-6 bg-cream p-6">
@@ -25,6 +26,8 @@ export default async function AdminResultadosPage() {
           (estado de cada persona), una pestaña &quot;Resultados&quot; (votos
           por candidato en cada categoría, de más a menos votado) y una
           pestaña por categoría con el detalle de quién votó a quién.
+          {isDriveConnected &&
+            " Cada descarga también sube una copia a tu Google Drive."}
         </p>
         <a
           href="/admin/resultados/export"
@@ -32,6 +35,23 @@ export default async function AdminResultadosPage() {
         >
           Descargar Excel
         </a>
+      </div>
+
+      <div className="rounded-3xl border-2 border-ink bg-white p-6">
+        <h2 className="font-display text-lg font-bold">Backup en Google Drive</h2>
+        <p className="mt-1 text-neutral-400">
+          {isDriveConnected
+            ? "Conectado — el Excel se sube solo a la carpeta \"Premios Nerea\" de tu Drive cada vez que lo descargas."
+            : "Todavía no está conectado. Conéctalo una vez y las siguientes exportaciones se subirán solas."}
+        </p>
+        {!isDriveConnected && (
+          <a
+            href="/api/auth/google/start"
+            className="mt-4 inline-block rounded-full border-2 border-ink px-6 py-2.5 font-display font-bold"
+          >
+            Conectar Google Drive
+          </a>
+        )}
       </div>
     </main>
   );

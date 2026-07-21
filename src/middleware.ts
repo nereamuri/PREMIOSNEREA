@@ -16,7 +16,8 @@ export function middleware(req: NextRequest) {
 export const config = {
   // /ceremonia vive fuera de /admin (para no heredar su cabecera de
   // navegación en la pantalla proyectada), pero necesita la misma
-  // protección por contraseña que el resto del panel.
-  matcher: ["/admin/:path*", "/ceremonia/:path*"],
+  // protección por contraseña que el resto del panel. Igual con el
+  // flujo de conexión a Google Drive: solo el admin debe poder iniciarlo.
+  matcher: ["/admin/:path*", "/ceremonia/:path*", "/api/auth/google/:path*"],
   runtime: "nodejs", // isValidSessionCookieValue usa node:crypto, no soportado en Edge
 };
