@@ -85,10 +85,11 @@ async function findOrCreateFolder(
   return created.data.id;
 }
 
-/** Sube (o reemplaza si ya existe) el Excel de resultados a la carpeta "Premios Nerea" del Drive conectado. */
-export async function uploadResultsToDrive(
+/** Sube (o reemplaza si ya existe) un archivo a la carpeta "Premios Nerea" del Drive conectado. */
+export async function uploadFileToDrive(
   buffer: Buffer,
-  filename: string
+  filename: string,
+  mimeType: string
 ): Promise<void> {
   const auth = getAuthorizedClient();
   const drive = google.drive({ version: "v3", auth });
@@ -101,11 +102,7 @@ export async function uploadResultsToDrive(
     spaces: "drive",
   });
 
-  const media = {
-    mimeType:
-      "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
-    body: bufferToStream(buffer),
-  };
+  const media = { mimeType, body: bufferToStream(buffer) };
 
   const existingFileId = existing.data.files?.[0]?.id;
   if (existingFileId) {

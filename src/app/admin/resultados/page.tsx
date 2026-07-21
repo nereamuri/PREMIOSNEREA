@@ -37,6 +37,23 @@ export default async function AdminResultadosPage() {
         </a>
       </div>
 
+      <div className="rounded-3xl border-[2.5px] border-ink bg-white p-6 shadow-sticker-ink">
+        <h2 className="font-display text-lg font-bold">Resumen de ganadores (PDF)</h2>
+        <p className="mt-1 text-neutral-400">
+          Un documento con una página por categoría mostrando a su ganador o
+          ganadores (foto, nombre y departamento), sin números de votos —
+          pensado para compartir o archivar tras la ceremonia.
+          {isDriveConnected &&
+            " También se sube una copia a tu Google Drive."}
+        </p>
+        <a
+          href="/admin/resultados/export-pdf"
+          className="mt-4 inline-block rounded-full bg-ink px-6 py-2.5 font-display font-bold text-cream shadow-sticker-fuchsia transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+        >
+          Descargar PDF
+        </a>
+      </div>
+
       <div className="rounded-3xl border-2 border-ink bg-white p-6">
         <h2 className="font-display text-lg font-bold">Backup en Google Drive</h2>
         <p className="mt-1 text-neutral-400">

@@ -1,7 +1,7 @@
 import * as XLSX from "xlsx";
 import { getActiveEvent } from "@/server/services/admin/categories";
 import { getResultsExportData } from "@/server/services/admin/results-export";
-import { uploadResultsToDrive } from "@/server/services/google-drive";
+import { uploadFileToDrive } from "@/server/services/google-drive";
 
 const STATUS_LABEL: Record<string, string> = {
   pending: "Pendiente",
@@ -88,7 +88,11 @@ export async function GET() {
   // descarga debe funcionar igualmente — nunca bloquear al admin por esto.
   if (process.env.GOOGLE_REFRESH_TOKEN) {
     try {
-      await uploadResultsToDrive(buffer, filename);
+      await uploadFileToDrive(
+        buffer,
+        filename,
+        "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"
+      );
     } catch (err) {
       console.error("No se pudo subir el Excel a Google Drive:", err);
     }
