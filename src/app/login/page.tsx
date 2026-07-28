@@ -17,7 +17,7 @@ export default async function LoginPage({
           Introduce la contraseña de administración para gestionar Premios
           Nerea.
         </p>
-        <LoginForm callbackUrl={params.callbackUrl ?? "/admin/dashboard"} />
+        <LoginForm callbackUrl={params.callbackUrl ?? "/admin"} />
       </div>
     </main>
   );

@@ -27,6 +27,14 @@ export async function getCategoriesWithCandidates(eventId: string) {
   });
 }
 
+export async function getAllCandidatesForEvent(eventId: string) {
+  return prisma.candidate.findMany({
+    where: { category: { eventId } },
+    orderBy: { createdAt: "asc" },
+    select: { id: true, name: true, photoUrl: true },
+  });
+}
+
 export type CategoriesWithCandidates = Awaited<
   ReturnType<typeof getCategoriesWithCandidates>
 >;

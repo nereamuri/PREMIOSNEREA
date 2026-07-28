@@ -37,7 +37,7 @@ export async function loginAction(
     maxAge: 60 * 60 * 24 * 7, // 7 días, igual que la duración de la firma
   });
 
-  redirect(callbackUrl || "/admin/dashboard");
+  redirect(callbackUrl || "/admin");
 }
 
 export async function logoutAction(): Promise<void> {

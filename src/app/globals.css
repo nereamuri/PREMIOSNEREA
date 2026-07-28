@@ -27,6 +27,7 @@
   --shadow-sticker-fuchsia: 5px 5px 0 0 #e0208a;
 
   --animate-fade-up: fade-up 0.4s ease-out;
+  --animate-marquee: marquee 140s linear infinite;
 
   @keyframes fade-up {
     0% {
@@ -36,6 +37,15 @@
     100% {
       opacity: 1;
       transform: translateY(0);
+    }
+  }
+
+  @keyframes marquee {
+    0% {
+      transform: translateX(0);
+    }
+    100% {
+      transform: translateX(-50%);
     }
   }
 }

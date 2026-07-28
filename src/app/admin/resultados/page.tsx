@@ -10,7 +10,7 @@ export default async function AdminResultadosPage() {
   const isDriveConnected = Boolean(process.env.GOOGLE_REFRESH_TOKEN);
 
   return (
-    <main className="mx-auto flex max-w-3xl flex-col gap-6 bg-cream p-6">
+    <main className="mx-auto flex max-w-5xl flex-col gap-6 bg-cream p-6">
       <div>
         <h1 className="font-display text-3xl font-bold">Resultados</h1>
         <p className="mt-1 text-neutral-400">

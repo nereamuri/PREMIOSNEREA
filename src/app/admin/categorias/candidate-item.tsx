@@ -107,23 +107,23 @@ export function CandidateItem({ candidate }: { candidate: Candidate }) {
             </p>
           )}
         </div>
-        <div className="flex shrink-0 gap-2">
-          <button
-            type="button"
-            onClick={() => setIsEditing(true)}
-            className="rounded-full border-2 border-ink px-4 py-1.5 text-sm font-bold"
-          >
-            Editar
-          </button>
-          <button
-            type="button"
-            disabled={isDeleting}
-            onClick={handleDelete}
-            className="rounded-full border-2 border-ink px-4 py-1.5 text-sm font-bold disabled:opacity-40"
-          >
-            Eliminar
-          </button>
-        </div>
+      </div>
+      <div className="flex gap-2">
+        <button
+          type="button"
+          onClick={() => setIsEditing(true)}
+          className="flex-1 rounded-full border-2 border-ink px-4 py-1.5 text-sm font-bold"
+        >
+          Editar
+        </button>
+        <button
+          type="button"
+          disabled={isDeleting}
+          onClick={handleDelete}
+          className="flex-1 rounded-full border-2 border-ink px-4 py-1.5 text-sm font-bold disabled:opacity-40"
+        >
+          Eliminar
+        </button>
       </div>
       {deleteError && (
         <p className="rounded-full border-2 border-ink bg-cream px-4 py-2 text-sm">
