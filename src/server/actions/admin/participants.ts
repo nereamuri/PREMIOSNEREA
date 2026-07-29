@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import * as XLSX from "xlsx";
 import { prisma } from "@/lib/db";
 import { Prisma } from "@/generated/prisma/client";
 import { generateVotingToken } from "@/lib/token";
@@ -11,6 +12,9 @@ import {
 } from "@/server/services/storage";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
+export type ImportResult =
+  | { ok: true; created: number; skipped: number; errors: string[] }
+  | { ok: false; error: string };
 
 function readPhoto(formData: FormData): File | null {
   const photo = formData.get("photo");
@@ -154,4 +158,108 @@ export async function deleteParticipantAction(
 
   revalidatePath("/admin/participantes");
   return { ok: true };
+}
+
+type ImportRow = { name: string; email: string; department: string | null };
+
+/** Busca la columna por nombre sin distinguir mayúsculas/acentos. */
+function findColumn(
+  row: Record<string, unknown>,
+  candidates: string[]
+): string | null {
+  const normalize = (s: string) =>
+    s
+      .normalize("NFD")
+      .replace(/[̀-ͯ]/g, "")
+      .trim()
+      .toLowerCase();
+  const keys = Object.keys(row);
+  for (const candidate of candidates) {
+    const key = keys.find((k) => normalize(k) === normalize(candidate));
+    if (key && row[key] != null && String(row[key]).trim() !== "") {
+      return String(row[key]).trim();
+    }
+  }
+  return null;
+}
+
+function parseParticipantsExcel(buffer: ArrayBuffer): {
+  rows: ImportRow[];
+  errors: string[];
+} {
+  const workbook = XLSX.read(buffer, { type: "array" });
+  const sheet = workbook.Sheets[workbook.SheetNames[0]];
+  const raw = XLSX.utils.sheet_to_json<Record<string, unknown>>(sheet);
+
+  const rows: ImportRow[] = [];
+  const errors: string[] = [];
+
+  raw.forEach((record, i) => {
+    const name = findColumn(record, ["Nombre", "Name"]);
+    const email = findColumn(record, ["Email", "Correo", "Correo electrónico"]);
+    const department = findColumn(record, ["Departamento", "Department"]);
+
+    if (!name || !email) {
+      errors.push(`Fila ${i + 2}: falta nombre o email, se ha saltado.`);
+      return;
+    }
+    rows.push({ name, email: email.toLowerCase(), department });
+  });
+
+  return { rows, errors };
+}
+
+/**
+ * Importa participantes desde un Excel con columnas Nombre / Email /
+ * Departamento (opcional). Cada fila válida crea un participante y su
+ * sesión de voto; los emails que ya existen en el evento se cuentan como
+ * "saltados" en vez de fallar toda la importación.
+ */
+export async function importParticipantsExcelAction(
+  eventId: string,
+  _prev: ImportResult,
+  formData: FormData
+): Promise<ImportResult> {
+  const file = formData.get("file");
+  if (!(file instanceof File) || file.size === 0) {
+    return { ok: false, error: "Selecciona un archivo Excel." };
+  }
+
+  const buffer = await file.arrayBuffer();
+  let parsed: { rows: ImportRow[]; errors: string[] };
+  try {
+    parsed = parseParticipantsExcel(buffer);
+  } catch {
+    return { ok: false, error: "No se pudo leer el archivo. ¿Es un .xlsx válido?" };
+  }
+
+  const { rows, errors } = parsed;
+  let created = 0;
+  let skipped = 0;
+
+  for (const row of rows) {
+    try {
+      const participant = await prisma.participant.create({
+        data: {
+          eventId,
+          name: row.name,
+          email: row.email,
+          department: row.department,
+        },
+      });
+      await prisma.votingSession.create({
+        data: { participantId: participant.id, token: generateVotingToken() },
+      });
+      created++;
+    } catch (err) {
+      if (err instanceof Prisma.PrismaClientKnownRequestError && err.code === "P2002") {
+        skipped++;
+      } else {
+        errors.push(`${row.email}: error al crearlo.`);
+      }
+    }
+  }
+
+  revalidatePath("/admin/participantes");
+  return { ok: true, created, skipped, errors };
 }
