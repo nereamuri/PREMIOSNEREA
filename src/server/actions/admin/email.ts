@@ -2,7 +2,10 @@
 
 import { revalidatePath } from "next/cache";
 import { prisma } from "@/lib/db";
-import { sendVotingInvitationEmail } from "@/server/services/email";
+import {
+  sendVotingInvitationEmail,
+  renderInvitationPreviewHtml,
+} from "@/server/services/email";
 import type { Prisma } from "@/generated/prisma/client";
 
 export type ActionResult = { ok: true } | { ok: false; error: string };
@@ -109,4 +112,22 @@ export async function sendBulkRemindersAction(
     include: { event: true, votingSession: true },
   });
   return sendToParticipants(participants, true);
+}
+
+/** HTML del email de invitación/recordatorio, para previsualizar antes de enviar. */
+export async function getInvitationEmailPreviewAction(
+  eventId: string,
+  isReminder: boolean
+): Promise<string> {
+  const event = await prisma.event.findUniqueOrThrow({ where: { id: eventId } });
+
+  return renderInvitationPreviewHtml({
+    participantName: "Nombre Apellido",
+    eventName: event.name,
+    eventDescription: event.description,
+    votingLink: "#",
+    opensAt: event.votingOpensAt,
+    closesAt: event.votingClosesAt,
+    isReminder,
+  });
 }

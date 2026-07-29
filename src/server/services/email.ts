@@ -127,11 +127,7 @@ function renderInvitationHtml(params: {
       <p style="font-size:15px;color:#111111;line-height:1.55;margin:0 0 14px;">
         ${intro}
       </p>
-      ${
-        params.eventDescription
-          ? `<p style="font-size:13.5px;color:#6b6b68;line-height:1.55;margin:0 0 14px;">${params.eventDescription}</p>`
-          : ""
-      }
+      <p style="font-size:13.5px;color:#6b6b68;line-height:1.55;margin:0 0 14px;">3ª edición</p>
       ${windowText ? `<p style="font-size:13.5px;color:#6b6b68;margin:4px 0 26px;">${windowText}</p>` : ""}
       <a href="${params.votingLink}" style="display:inline-block;background-color:#111111;color:#F7F2EA;text-decoration:none;font-weight:700;font-size:16px;padding:15px 34px;border-radius:999px;box-shadow:5px 5px 0 0 #E0208A;">
         Votar ahora
@@ -149,6 +145,21 @@ function renderInvitationHtml(params: {
       }
     </div>
   </div>`;
+}
+
+/**
+ * Igual que renderInvitationHtml, pero para mostrar en el navegador (panel
+ * de admin) en vez de enviarlo como email real: el logo usa la ruta pública
+ * normal en vez de la referencia cid:, que solo funciona dentro de un email
+ * de verdad con su adjunto.
+ */
+export function renderInvitationPreviewHtml(
+  params: Parameters<typeof renderInvitationHtml>[0]
+): string {
+  return renderInvitationHtml(params).replace(
+    `cid:${LOGO_CID}`,
+    "/nereapremios.png"
+  );
 }
 
 export async function sendVotingInvitationEmail(params: {
