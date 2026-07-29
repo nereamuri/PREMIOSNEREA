@@ -23,7 +23,7 @@ export default function AdminLayout({
           <nav className="flex flex-wrap gap-4 font-display text-sm font-bold">
             <Link href="/admin/dashboard">Dashboard</Link>
             <Link href="/admin/categorias">Categorías</Link>
-            <Link href="/admin/participantes">Participantes</Link>
+            <Link href="/admin/participantes">Emails</Link>
             <Link href="/admin/resultados">Resultados</Link>
             <Link href="/ceremonia">Modo Ceremonia</Link>
           </nav>

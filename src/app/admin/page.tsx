@@ -31,7 +31,7 @@ function NextAction({
           href="/admin/participantes"
           className="mt-4 inline-block rounded-full bg-ink px-6 py-2.5 font-display font-bold text-cream shadow-sticker-fuchsia transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         >
-          Ir a Participantes
+          Ir a Emails
         </Link>
       </>
     );
@@ -44,13 +44,13 @@ function NextAction({
           Faltan {pending + inProgress} persona{pending + inProgress === 1 ? "" : "s"} por votar
         </p>
         <p className="mt-1 text-neutral-400">
-          Puedes enviarles un recordatorio desde Participantes.
+          Puedes enviarles un recordatorio desde Emails.
         </p>
         <Link
           href="/admin/participantes"
           className="mt-4 inline-block rounded-full bg-ink px-6 py-2.5 font-display font-bold text-cream shadow-sticker-fuchsia transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
         >
-          Ir a Participantes
+          Ir a Emails
         </Link>
       </>
     );
@@ -90,7 +90,7 @@ const SECTIONS = [
   },
   {
     href: "/admin/participantes",
-    title: "Participantes",
+    title: "Emails",
     description: "Altas, enlaces de voto y envío de emails.",
   },
   {
