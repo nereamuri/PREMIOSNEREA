@@ -195,3 +195,94 @@ export async function sendVotingInvitationEmail(params: {
     ],
   });
 }
+
+export type ResultsEmailCategory = {
+  id: string;
+  name: string;
+  winners: { id: string; name: string; photoUrl: string | null }[];
+};
+
+function renderWinnerPhoto(photoUrl: string | null, name: string): string {
+  if (photoUrl) {
+    return `<img src="${photoUrl}" alt="${name}" width="56" height="56" style="display:block;width:56px;height:56px;border-radius:50%;border:2px solid #111111;object-fit:cover;" />`;
+  }
+  return `<div style="display:flex;align-items:center;justify-content:center;width:56px;height:56px;border-radius:50%;border:2px solid #111111;background:#F7F2EA;font-weight:700;font-size:20px;">${name.charAt(0).toUpperCase()}</div>`;
+}
+
+function renderResultsHtml(params: {
+  eventName: string;
+  categories: ResultsEmailCategory[];
+  logoSrc: string;
+}): string {
+  const categoriesHtml = params.categories
+    .map((category) => {
+      const winnersHtml = category.winners.length
+        ? category.winners
+            .map(
+              (w) => `
+              <div style="display:flex;align-items:center;gap:12px;margin-top:8px;">
+                ${renderWinnerPhoto(w.photoUrl, w.name)}
+                <span style="font-size:15px;font-weight:700;color:#111111;">${w.name}</span>
+              </div>`
+            )
+            .join("")
+        : `<p style="font-size:13.5px;color:#6b6b68;margin:8px 0 0;">Sin votos suficientes.</p>`;
+
+      return `
+      <div style="margin:0 0 22px;">
+        <p style="font-size:12px;font-weight:700;text-transform:uppercase;letter-spacing:0.04em;color:#6b6b68;margin:0;">${category.name}</p>
+        ${winnersHtml}
+      </div>`;
+    })
+    .join("");
+
+  return `
+  <div style="background-color:#F7F2EA;padding:32px 16px;font-family:Arial,Helvetica,sans-serif;">
+    <div style="max-width:480px;margin:0 auto 16px;text-align:center;">
+      <div style="display:inline-block;background-color:#FFFFFF;border:2px solid #111111;border-radius:24px;padding:20px;box-shadow:5px 5px 0 0 #E0208A;">
+        <img src="${params.logoSrc}" width="96" height="84" alt="${params.eventName}" style="display:block;width:96px;height:auto;" />
+      </div>
+    </div>
+    <div style="max-width:480px;margin:0 auto;background-color:#FFFFFF;border:2px solid #111111;border-radius:24px;padding:36px 32px;text-align:center;box-shadow:5px 5px 0 0 #111111;">
+      <h1 style="font-size:23px;font-weight:800;color:#111111;margin:0 0 18px;letter-spacing:-0.01em;">¡Ya tenemos ganadores! 🏆</h1>
+      <p style="font-size:15px;color:#111111;line-height:1.55;margin:0 0 22px;">
+        Gracias a todos por participar en los <strong>${params.eventName}</strong>. Aquí tenéis a los ganadores de esta edición:
+      </p>
+      <div style="text-align:left;">
+        ${categoriesHtml}
+      </div>
+      <p style="font-size:14px;color:#111111;line-height:1.5;margin:26px 0 0;">
+        Ha sido un placer contar con vuestra participación. ¡Larga vida a los ${params.eventName} y hasta la próxima edición!
+      </p>
+    </div>
+  </div>`;
+}
+
+export function renderResultsPreviewHtml(params: {
+  eventName: string;
+  categories: ResultsEmailCategory[];
+}): string {
+  return renderResultsHtml({ ...params, logoSrc: "/nereapremios.png" });
+}
+
+export async function sendResultsEmail(params: {
+  to: string;
+  eventName: string;
+  categories: ResultsEmailCategory[];
+}): Promise<void> {
+  const transport = getTransport();
+  const fromName = process.env.SMTP_FROM_NAME ?? "Premios Nerea";
+  const fromEmail = process.env.SMTP_FROM_EMAIL ?? process.env.SMTP_USER;
+
+  await transport.sendMail({
+    from: `"${fromName}" <${fromEmail}>`,
+    to: params.to,
+    subject: `Resultados de ${params.eventName} 🏆`,
+    html: renderResultsHtml({
+      eventName: params.eventName,
+      categories: params.categories,
+      logoSrc: `cid:${LOGO_CID}`,
+    }),
+    attachments: [getLogoAttachment()],
+  });
+}

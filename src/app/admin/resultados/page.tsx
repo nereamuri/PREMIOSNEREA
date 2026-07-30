@@ -1,5 +1,6 @@
 import { getActiveEvent } from "@/server/services/admin/categories";
 import { getParticipantsWithSessions } from "@/server/services/admin/participants";
+import { SendResultsEmailButton } from "./send-results-email-button";
 
 export default async function AdminResultadosPage() {
   const event = await getActiveEvent();
@@ -46,12 +47,15 @@ export default async function AdminResultadosPage() {
           {isDriveConnected &&
             " También se sube una copia a tu Google Drive."}
         </p>
-        <a
-          href="/admin/resultados/export-pdf"
-          className="mt-4 inline-block rounded-full bg-ink px-6 py-2.5 font-display font-bold text-cream shadow-sticker-fuchsia transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
-        >
-          Descargar PDF
-        </a>
+        <div className="mt-4 flex flex-wrap gap-3">
+          <a
+            href="/admin/resultados/export-pdf"
+            className="inline-block rounded-full bg-ink px-6 py-2.5 font-display font-bold text-cream shadow-sticker-fuchsia transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          >
+            Descargar PDF
+          </a>
+          <SendResultsEmailButton eventId={event.id} />
+        </div>
       </div>
 
       <div className="rounded-3xl border-2 border-ink bg-white p-6">

@@ -7,7 +7,7 @@ import {
   sendBulkRemindersAction,
   type BulkEmailResult,
 } from "@/server/actions/admin/email";
-import { EmailPreviewModal } from "./email-preview-modal";
+import { EmailPreviewModal } from "../email-preview-modal";
 
 type Feedback = { sent: number; failed: number; errors: string[] } | { error: string };
 type PreviewState = { kind: "invite" | "remind"; html: string } | null;
