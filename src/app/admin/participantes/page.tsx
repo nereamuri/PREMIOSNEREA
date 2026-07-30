@@ -4,6 +4,7 @@ import { ParticipantItem } from "./participant-item";
 import { NewParticipantForm } from "./new-participant-form";
 import { BulkEmailButton } from "./bulk-email-button";
 import { ImportParticipantsForm } from "./import-participants-form";
+import { AllLinksPanel } from "./all-links-panel";
 
 export default async function AdminParticipantesPage() {
   const event = await getActiveEvent();
@@ -21,6 +22,15 @@ export default async function AdminParticipantesPage() {
       <BulkEmailButton eventId={event.id} />
 
       <ImportParticipantsForm eventId={event.id} />
+
+      <AllLinksPanel
+        participants={participants.map((p) => ({
+          id: p.id,
+          name: p.name,
+          email: p.email,
+          token: p.votingSession?.token ?? null,
+        }))}
+      />
 
       <div className="flex flex-col gap-3">
         {participants.map((participant) => (
