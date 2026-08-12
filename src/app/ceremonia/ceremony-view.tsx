@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useState } from "react";
+import Link from "next/link";
 import { motion } from "motion/react";
 import type {
   CeremonyCategory,
@@ -95,16 +96,24 @@ export function CeremonyView({
         <h1 className="font-display text-4xl font-bold">
           ¡Enhorabuena a todos los ganadores!
         </h1>
-        <button
-          type="button"
-          onClick={() => {
-            setCategoryIndex(0);
-            setPhase("intro");
-          }}
-          className="rounded-full border-2 border-ink px-6 py-2 font-display font-bold"
-        >
-          Reiniciar
-        </button>
+        <div className="flex gap-3">
+          <button
+            type="button"
+            onClick={() => {
+              setCategoryIndex(0);
+              setPhase("intro");
+            }}
+            className="rounded-full border-2 border-ink px-6 py-2 font-display font-bold"
+          >
+            Reiniciar
+          </button>
+          <Link
+            href="/admin/dashboard"
+            className="rounded-full bg-ink px-6 py-2 font-display font-bold text-cream shadow-sticker-fuchsia transition-transform active:translate-x-[2px] active:translate-y-[2px] active:shadow-none"
+          >
+            Salir al dashboard
+          </Link>
+        </div>
       </main>
     );
   }
@@ -156,7 +165,13 @@ export function CeremonyView({
 
 function DarkScreen({ children }: { children: React.ReactNode }) {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden bg-ink p-8 text-center text-cream">
+    <main className="relative flex min-h-screen flex-col items-center justify-center gap-6 overflow-hidden bg-ink p-8 text-center text-cream">
+      <Link
+        href="/admin/dashboard"
+        className="absolute right-6 top-6 rounded-full border-2 border-cream/40 px-4 py-1.5 text-sm font-bold text-cream/70 transition-colors hover:border-cream hover:text-cream"
+      >
+        ✕ Salir
+      </Link>
       {children}
     </main>
   );
